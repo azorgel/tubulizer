@@ -12,6 +12,7 @@ RUN curl -L "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_li
 RUN curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh
 
 WORKDIR /app
+ENV PYTHONUNBUFFERED=1
 COPY main.py .
 COPY static/ static/
 
