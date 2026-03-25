@@ -285,6 +285,7 @@ class TubulizerHandler(BaseHTTPRequestHandler):
         ]
         try:
             r = run(cmd)
+            print("yt-dlp stderr:", r.stderr[-2000:] if r.stderr else "(none)")
             if r.returncode != 0:
                 raise RuntimeError(yt_error(r))
 

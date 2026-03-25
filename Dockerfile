@@ -2,14 +2,14 @@ FROM python:3.12-slim
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ffmpeg curl unzip && \
-    rm -rf /var/lib/apt/lists/* && \
-    pip install --no-cache-dir yt-dlp
+    rm -rf /var/lib/apt/lists/*
 
-# Install Deno (yt-dlp's preferred JS runtime for YouTube challenge solving)
+# Install latest yt-dlp binary directly from GitHub (always up to date)
+RUN curl -L "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux" \
+    -o /usr/local/bin/yt-dlp && chmod a+rx /usr/local/bin/yt-dlp
+
+# Install Deno (yt-dlp's preferred JS runtime)
 RUN curl -fsSL https://deno.land/install.sh | DENO_INSTALL=/usr/local sh
-
-# Pre-cache the EJS challenge solver script from GitHub
-RUN yt-dlp --remote-components ejs:github --simulate "https://www.youtube.com/watch?v=jNQXAC9IVRw" 2>/dev/null || true
 
 WORKDIR /app
 COPY main.py .
