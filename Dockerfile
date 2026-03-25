@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 # Install ffmpeg and yt-dlp
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg && \
+    apt-get install -y --no-install-recommends ffmpeg nodejs && \
     rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir yt-dlp
 

@@ -44,7 +44,7 @@ MIME = {
     ".opus": "audio/ogg",
 }
 
-EXTRACTOR_ARGS = "--extractor-args=youtube:player_client=tv_embedded"
+EXTRA_ARGS = ["--extractor-args", "youtube:player_client=web", "--js-runtimes", "node"]
 
 # Quality presets shown to the user.
 # Each maps to a yt-dlp format selector.
@@ -77,7 +77,7 @@ def yt_error(r):
 
 
 def get_info(url):
-    r = run([YT_DLP, "--dump-json", "--no-playlist", EXTRACTOR_ARGS, url])
+    r = run([YT_DLP, "--dump-json", "--no-playlist", *EXTRA_ARGS, url])
     if r.returncode != 0:
         raise RuntimeError(yt_error(r))
     return json.loads(r.stdout)
@@ -261,6 +261,7 @@ class TubulizerHandler(BaseHTTPRequestHandler):
             "--no-playlist",
             "-f", fmt,
             *extra,
+            *EXTRA_ARGS,
             "--retries", "3",
             "--fragment-retries", "3",
             "-o", str(out_dir / "%(title)s.%(ext)s"),
