@@ -61,9 +61,9 @@ def get_extra_args():
 # Quality presets shown to the user.
 # Each maps to a yt-dlp format selector.
 PRESETS = [
-    {"id": "best",  "label": "Best available",  "kind": "video", "height": None, "fmt": "bestvideo[height>=720]+bestaudio/bestvideo+bestaudio/best"},
-    {"id": "1080",  "label": "1080p HD",         "kind": "video", "height": 1080, "fmt": "bestvideo[height<=1080][height>=720]+bestaudio/bestvideo[height<=1080]+bestaudio/best[height<=1080]/bestvideo+bestaudio"},
-    {"id": "720",   "label": "720p HD",          "kind": "video", "height": 720,  "fmt": "bestvideo[height<=720][height>=480]+bestaudio/bestvideo[height<=720]+bestaudio/best[height<=720]/bestvideo+bestaudio"},
+    {"id": "best",  "label": "Best available",  "kind": "video", "height": None, "fmt": "bestvideo+bestaudio/best"},
+    {"id": "1080",  "label": "1080p HD",         "kind": "video", "height": 1080, "fmt": "bestvideo[height<=1080]+bestaudio/best[height<=1080]/bestvideo+bestaudio"},
+    {"id": "720",   "label": "720p HD",          "kind": "video", "height": 720,  "fmt": "bestvideo[height<=720]+bestaudio/best[height<=720]/bestvideo+bestaudio"},
     {"id": "480",   "label": "480p",             "kind": "video", "height": 480,  "fmt": "bestvideo[height<=480]+bestaudio/best[height<=480]/bestvideo+bestaudio"},
     {"id": "360",   "label": "360p",             "kind": "video", "height": 360,  "fmt": "bestvideo[height<=360]+bestaudio/best[height<=360]/bestvideo+bestaudio"},
     {"id": "audio", "label": "Audio only (m4a)", "kind": "audio", "height": None, "fmt": "bestaudio[ext=m4a]/bestaudio/best"},
