@@ -460,12 +460,26 @@
         <span id="cookiesBadge" class="pill" style="font-size:0.72rem"></span>
         <svg id="cookiesChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div id="cookiesForm" class="hidden" style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
-        <p style="color:var(--muted);font-size:0.82rem;line-height:1.5">Upload a <code style="color:var(--cyan);font-size:0.8rem">cookies.txt</code> file exported from your browser while signed into YouTube. Stored until the server restarts.</p>
+      <div id="cookiesForm" class="hidden" style="margin-top:16px;display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.12);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+          <p style="color:var(--muted);font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">How to get your cookies.txt</p>
+          <ol style="color:var(--muted);font-size:0.82rem;line-height:1.7;padding-left:18px;display:flex;flex-direction:column;gap:2px;">
+            <li>Install the browser extension:
+              <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank" rel="noopener" style="color:var(--cyan);text-decoration:none;">Chrome</a>
+              &nbsp;·&nbsp;
+              <a href="https://addons.mozilla.org/en-US/firefox/addon/cookies-txt/" target="_blank" rel="noopener" style="color:var(--cyan);text-decoration:none;">Firefox</a>
+            </li>
+            <li>Sign into <a href="https://youtube.com" target="_blank" rel="noopener" style="color:var(--cyan);text-decoration:none;">youtube.com</a> in your browser</li>
+            <li>Click the extension icon while on YouTube</li>
+            <li>Click <strong style="color:var(--text);">Export</strong> — this downloads a <code style="color:var(--cyan);font-size:0.79rem;">cookies.txt</code> file</li>
+            <li>Upload that file below</li>
+          </ol>
+          <p style="color:rgba(112,112,160,0.7);font-size:0.76rem;line-height:1.5;">Cookies are stored until the server restarts. Re-upload if downloads stop working.</p>
+        </div>
         <input type="file" id="cookiesFile" accept=".txt" style="font-size:0.85rem;color:var(--muted);background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;width:100%"/>
         <input id="cookiesPassword" type="password" placeholder="Upload password (if required)" style="background:rgba(0,0,0,0.3);border:1px solid rgba(180,79,255,0.2);border-radius:8px;padding:10px 12px;color:var(--text);font-size:0.85rem;outline:none;width:100%"/>
         <button id="cookiesUploadBtn" class="btn btn-primary" style="align-self:flex-start">Upload Cookies</button>
-        <div id="cookiesMsg" class="hidden" style="font-size:0.82rem;padding:8px 0"></div>
+        <div id="cookiesMsg" class="hidden" style="font-size:0.82rem;padding:4px 0"></div>
       </div>
     </section>
   </main>
