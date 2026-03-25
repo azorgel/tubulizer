@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tubulizer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0f0f0f;
+      --card:    #1a1a1a;
+      --card2:   #222;
+      --border:  #333;
+      --red:     #ff0033;
+      --text:    #f1f1f1;
+      --muted:   #aaa;
+      --dim:     #666;
+      --radius:  10px;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      max-width: 660px;
+      margin: 0 auto;
+      padding: 52px 24px 80px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--red);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-icon svg { display: block; }
+
+    .logo-text h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .logo-text p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* Input card */
+    .input-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .input-row { display: flex; gap: 8px; }
+
+    .input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0 12px;
+      min-width: 0;
+      transition: border-color 0.15s;
+    }
+    .input-wrap:focus-within { border-color: #555; }
+    .input-wrap svg { color: var(--dim); flex-shrink: 0; }
+
+    #urlInput {
+      flex: 1;
+      min-width: 0;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 0.875rem;
+      padding: 12px 0;
+      font-family: "SF Mono", "Fira Code", monospace;
+    }
+    #urlInput::placeholder { color: var(--dim); }
+
+    .clear-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--dim);
+      font-size: 18px;
+      line-height: 1;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .clear-btn:hover { color: var(--muted); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    .btn-analyse {
+      background: var(--text);
+      color: #000;
+      padding: 0 20px;
+      height: 44px;
+    }
+    .btn-analyse:hover:not(:disabled) { filter: brightness(0.88); }
+
+    .btn-download {
+      width: 100%;
+      justify-content: center;
+      background: var(--red);
+      color: #fff;
+      padding: 13px 20px;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+    }
+    .btn-download:hover:not(:disabled) { filter: brightness(1.12); }
+
+    /* Status */
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--muted);
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .error {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(255,0,51,0.07);
+      border: 1px solid rgba(255,0,51,0.22);
+      border-radius: var(--radius);
+      padding: 13px 16px;
+      color: #ff7788;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .error svg { flex-shrink: 0; margin-top: 1px; }
+
+    /* Video info card */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .video-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .thumb {
+      width: 148px;
+      flex-shrink: 0;
+      border-radius: 7px;
+      display: block;
+      background: var(--card2);
+    }
+
+    .video-meta { flex: 1; min-width: 0; }
+
+    .video-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 9px;
+    }
+
+    /* Formats */
+    .formats-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 10px;
+    }
+
+    .format-list { display: flex; flex-direction: column; gap: 5px; }
+
+    .fmt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--card2);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.12s;
+    }
+    .fmt:hover { border-color: #555; }
+    .fmt.selected { border-color: var(--text); }
+
+    .fmt-dot {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 2px solid var(--dim);
+      flex-shrink: 0;
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+    .fmt.selected .fmt-dot {
+      border-color: var(--text);
+      background: var(--text);
+      box-shadow: inset 0 0 0 3px var(--card2);
+    }
+
+    .fmt-name { flex: 1; font-size: 0.875rem; font-weight: 500; }
+
+    .fmt-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--dim);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+    .fmt.selected .fmt-tag { color: var(--muted); border-color: #555; }
+
+    /* Download in progress */
+    .dl-progress {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 0 8px;
+    }
+
+    .dl-progress p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 3px;
+      background: var(--card2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--red);
+      border-radius: 2px;
+      animation: indeterminate 1.6s ease-in-out infinite;
+      transform-origin: left;
+    }
+    @keyframes indeterminate {
+      0%   { transform: translateX(-100%) scaleX(0.4); }
+      50%  { transform: translateX(60%)  scaleX(0.6); }
+      100% { transform: translateX(200%) scaleX(0.4); }
+    }
+
+    /* Utility */
+    .hidden { display: none !important; }
+
+    @media (max-width: 500px) {
+      main { padding: 28px 16px 60px; }
+      .video-row { flex-direction: column; }
+      .thumb { width: 100%; max-height: 180px; object-fit: cover; }
+      .input-row { flex-direction: column; }
+      .btn-analyse { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+<main>
+
+  <header>
+    <div class="logo-icon">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <polygon points="7,4 17,10 7,16" fill="white"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <h1>Tubulizer</h1>
+      <p>YouTube video downloader</p>
+    </div>
+  </header>
+
+  <div class="input-card">
+    <div class="input-row">
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <input id="urlInput" type="text" placeholder="https://youtube.com/watch?v=…" autocomplete="off" spellcheck="false"/>
+        <button id="clearBtn" class="clear-btn hidden">✕</button>
+      </div>
+      <button id="fetchBtn" class="btn btn-analyse">Analyse</button>
+    </div>
+  </div>
+
+  <div id="loadingState" class="status hidden">
+    <div class="spinner"></div>
+    <span>Fetching video info…</span>
+  </div>
+
+  <div id="errorState" class="error hidden">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span id="errorMsg">Something went wrong.</span>
+  </div>
+
+  <div id="resultsSection" class="hidden">
+    <div class="card video-row">
+      <img id="thumbnail" class="thumb" src="" alt=""/>
+      <div class="video-meta">
+        <p id="videoTitle" class="video-title"></p>
+        <div class="meta-row">
+          <span class="chip" id="uploader"></span>
+          <span class="chip" id="duration"></span>
+          <span class="chip" id="viewCount"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="formats-label">Quality</p>
+      <div id="formatList" class="format-list"></div>
+      <button id="downloadBtn" class="btn btn-download" disabled>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download
+      </button>
+    </div>
+  </div>
+
+  <div id="downloadProgress" class="hidden">
+    <div class="dl-progress">
+      <div class="progress-track"><div class="progress-fill"></div></div>
+      <p>Downloading — this may take a minute…</p>
+    </div>
+  </div>
+
+</main>
+<script>
+const urlInput    = document.getElementById('urlInput');
+const clearBtn    = document.getElementById('clearBtn');
+const fetchBtn    = document.getElementById('fetchBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const loadingState     = document.getElementById('loadingState');
+const errorState       = document.getElementById('errorState');
+const errorMsg         = document.getElementById('errorMsg');
+const resultsSection   = document.getElementById('resultsSection');
+const downloadProgress = document.getElementById('downloadProgress');
+const thumbnail  = document.getElementById('thumbnail');
+const videoTitle = document.getElementById('videoTitle');
+const uploader   = document.getElementById('uploader');
+const duration   = document.getElementById('duration');
+const viewCount  = document.getElementById('viewCount');
+const formatList = document.getElementById('formatList');
+
+let currentUrl = '', selectedFormat = null;
+
+function fmtDuration(sec) {
+  if (!sec) return '—';
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  if (h) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+function fmtViews(n) {
+  if (!n) return '—';
+  if (n >= 1e9) return (n/1e9).toFixed(1)+'B views';
+  if (n >= 1e6) return (n/1e6).toFixed(1)+'M views';
+  if (n >= 1e3) return (n/1e3).toFixed(1)+'K views';
+  return n+' views';
+}
+function showError(msg) { errorMsg.textContent = msg; errorState.classList.remove('hidden'); }
+function hideAll() {
+  loadingState.classList.add('hidden'); errorState.classList.add('hidden');
+  resultsSection.classList.add('hidden'); downloadProgress.classList.add('hidden');
+}
+
+urlInput.addEventListener('input', () => {
+  clearBtn.classList.toggle('hidden', !urlInput.value);
+  errorState.classList.add('hidden');
+});
+clearBtn.addEventListener('click', () => {
+  urlInput.value = ''; clearBtn.classList.add('hidden');
+  hideAll(); selectedFormat = null; urlInput.focus();
+});
+urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') fetchInfo(); });
+fetchBtn.addEventListener('click', fetchInfo);
+
+async function fetchInfo() {
+  const url = urlInput.value.trim();
+  if (!url) { urlInput.focus(); return; }
+  currentUrl = url; selectedFormat = null;
+  hideAll(); loadingState.classList.remove('hidden'); fetchBtn.disabled = true;
+  try {
+    const res = await fetch('/api/info', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({url})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || `Server error ${res.status}`);
+    loadingState.classList.add('hidden');
+    renderResults(data);
+  } catch (err) {
+    loadingState.classList.add('hidden');
+    showError(err.message || 'Failed to fetch video info.');
+  } finally { fetchBtn.disabled = false; }
+}
+
+function renderResults(data) {
+  thumbnail.src = data.thumbnail || '';
+  videoTitle.textContent = data.title || 'Unknown title';
+  uploader.textContent = data.uploader || '';
+  duration.textContent = fmtDuration(data.duration);
+  viewCount.textContent = fmtViews(data.view_count);
+  formatList.innerHTML = ''; downloadBtn.disabled = true;
+  (data.formats || []).forEach(fmt => {
+    const item = document.createElement('div');
+    item.className = 'fmt';
+    item.innerHTML = `<div class="fmt-dot"></div><span class="fmt-name">${fmt.label}</span><span class="fmt-tag">${fmt.kind === 'audio' ? 'audio' : 'mp4'}</span>`;
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.fmt').forEach(i => i.classList.remove('selected'));
+      item.classList.add('selected'); selectedFormat = fmt; downloadBtn.disabled = false;
+    });
+    formatList.appendChild(item);
+  });
+  if (!data.formats?.length) formatList.innerHTML = '<p style="color:var(--dim);font-size:.85rem">No formats found.</p>';
+  resultsSection.classList.remove('hidden');
+}
+
+downloadBtn.addEventListener('click', async () => {
+  if (!selectedFormat || !currentUrl) return;
+  downloadProgress.classList.remove('hidden'); downloadBtn.disabled = true; errorState.classList.add('hidden');
+  try {
+    const res = await fetch('/api/download', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({url: currentUrl, format_id: selectedFormat.id})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || `Download error ${res.status}`);
+    const a = document.createElement('a');
+    a.href = data.path; a.download = data.filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    downloadProgress.classList.add('hidden');
+  } catch (err) {
+    downloadProgress.classList.add('hidden');
+    showError(err.message || 'Download failed.');
+  } finally { downloadBtn.disabled = false; }
+});
+</script>
+</body>
+</html>

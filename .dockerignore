@@ -1,0 +1,6 @@
+Tubulizer.app
+Tubulizer.zip
+downloads/
+__pycache__/
+*.pyc
+build_app.sh
