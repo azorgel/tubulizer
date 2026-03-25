@@ -44,7 +44,7 @@ MIME = {
     ".opus": "audio/ogg",
 }
 
-EXTRACTOR_ARGS = "--extractor-args=youtube:player_client=ios,web"
+EXTRACTOR_ARGS = "--extractor-args=youtube:player_client=tv_embedded"
 
 # Quality presets shown to the user.
 # Each maps to a yt-dlp format selector.
