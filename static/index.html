@@ -452,6 +452,22 @@
       </div>
       <span>Preparing download…</span>
     </div>
+
+    <section class="card" style="margin-top:8px">
+      <button id="cookiesToggle" style="width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:10px;color:var(--text);padding:0;font-size:0.85rem;font-weight:600;letter-spacing:0.03em;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        <span style="flex:1;text-align:left;color:var(--muted)">YouTube Authentication</span>
+        <span id="cookiesBadge" class="pill" style="font-size:0.72rem"></span>
+        <svg id="cookiesChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div id="cookiesForm" class="hidden" style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+        <p style="color:var(--muted);font-size:0.82rem;line-height:1.5">Upload a <code style="color:var(--cyan);font-size:0.8rem">cookies.txt</code> file exported from your browser while signed into YouTube. Stored until the server restarts.</p>
+        <input type="file" id="cookiesFile" accept=".txt" style="font-size:0.85rem;color:var(--muted);background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;width:100%"/>
+        <input id="cookiesPassword" type="password" placeholder="Upload password (if required)" style="background:rgba(0,0,0,0.3);border:1px solid rgba(180,79,255,0.2);border-radius:8px;padding:10px 12px;color:var(--text);font-size:0.85rem;outline:none;width:100%"/>
+        <button id="cookiesUploadBtn" class="btn btn-primary" style="align-self:flex-start">Upload Cookies</button>
+        <div id="cookiesMsg" class="hidden" style="font-size:0.82rem;padding:8px 0"></div>
+      </div>
+    </section>
   </main>
 
 <script>
@@ -658,6 +674,60 @@ async function startDownload() {
     downloadBtn.disabled = false;
   }
 }
+// ── Cookies auth ────────────────────────────────────────────
+
+const cookiesToggle    = document.getElementById('cookiesToggle');
+const cookiesForm      = document.getElementById('cookiesForm');
+const cookiesBadge     = document.getElementById('cookiesBadge');
+const cookiesChevron   = document.getElementById('cookiesChevron');
+const cookiesFile      = document.getElementById('cookiesFile');
+const cookiesPassword  = document.getElementById('cookiesPassword');
+const cookiesUploadBtn = document.getElementById('cookiesUploadBtn');
+const cookiesMsg       = document.getElementById('cookiesMsg');
+
+async function checkCookiesStatus() {
+  try {
+    const res  = await fetch('/api/cookies-status');
+    const data = await res.json();
+    cookiesBadge.textContent = data.active ? 'Active' : 'Not set';
+    cookiesBadge.style.color = data.active ? 'var(--cyan)' : 'var(--muted)';
+    cookiesBadge.style.borderColor = data.active ? 'rgba(0,229,255,0.25)' : 'rgba(255,255,255,0.1)';
+    cookiesBadge.style.background  = data.active ? 'rgba(0,229,255,0.06)' : 'rgba(255,255,255,0.03)';
+  } catch {}
+}
+
+cookiesToggle.addEventListener('click', () => {
+  const open = cookiesForm.classList.toggle('hidden');
+  cookiesChevron.style.transform = open ? '' : 'rotate(180deg)';
+});
+
+cookiesUploadBtn.addEventListener('click', async () => {
+  const file = cookiesFile.files[0];
+  if (!file) { showCookiesMsg('Please select a cookies.txt file.', false); return; }
+  const content  = await file.text();
+  const password = cookiesPassword.value;
+  try {
+    const res  = await fetch('/api/cookies', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ content, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+    showCookiesMsg('Cookies uploaded successfully.', true);
+    checkCookiesStatus();
+  } catch (err) {
+    showCookiesMsg(err.message || 'Upload failed.', false);
+  }
+});
+
+function showCookiesMsg(msg, success) {
+  cookiesMsg.textContent = msg;
+  cookiesMsg.style.color = success ? 'var(--cyan)' : '#ff6680';
+  cookiesMsg.classList.remove('hidden');
+}
+
+checkCookiesStatus();
 </script>
 </body>
 </html>

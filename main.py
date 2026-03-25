@@ -44,7 +44,16 @@ MIME = {
     ".opus": "audio/ogg",
 }
 
-EXTRA_ARGS = ["--extractor-args", "youtube:player_client=web", "--js-runtimes", "node"]
+COOKIES_FILE     = Path(__file__).parent / "cookies.txt"
+COOKIES_PASSWORD = os.environ.get("COOKIES_PASSWORD", "")
+
+
+def get_extra_args():
+    args = []
+    if COOKIES_FILE.exists():
+        args += ["--cookies", str(COOKIES_FILE)]
+    args += ["--extractor-args", "youtube:player_client=web", "--js-runtimes", "node"]
+    return args
 
 # Quality presets shown to the user.
 # Each maps to a yt-dlp format selector.
@@ -77,7 +86,7 @@ def yt_error(r):
 
 
 def get_info(url):
-    r = run([YT_DLP, "--dump-json", "--no-playlist", *EXTRA_ARGS, url])
+    r = run([YT_DLP, "--dump-json", "--no-playlist", *get_extra_args(), url])
     if r.returncode != 0:
         raise RuntimeError(yt_error(r))
     return json.loads(r.stdout)
@@ -147,6 +156,8 @@ class TubulizerHandler(BaseHTTPRequestHandler):
             self.serve_file(STATIC_DIR / path[len("/static/"):])
         elif path.startswith("/downloads/"):
             self.serve_file(DOWNLOAD_DIR / path[len("/downloads/"):], attachment=True)
+        elif path == "/api/cookies-status":
+            self.send_json(200, {"active": COOKIES_FILE.exists()})
         else:
             self.send_response(404)
             self.end_headers()
@@ -214,6 +225,8 @@ class TubulizerHandler(BaseHTTPRequestHandler):
             self.handle_info(data)
         elif path == "/api/download":
             self.handle_download(data)
+        elif path == "/api/cookies":
+            self.handle_cookies(data)
         else:
             self.send_response(404)
             self.end_headers()
@@ -261,7 +274,7 @@ class TubulizerHandler(BaseHTTPRequestHandler):
             "--no-playlist",
             "-f", fmt,
             *extra,
-            *EXTRA_ARGS,
+            *get_extra_args(),
             "--retries", "3",
             "--fragment-retries", "3",
             "-o", str(out_dir / "%(title)s.%(ext)s"),
@@ -286,6 +299,19 @@ class TubulizerHandler(BaseHTTPRequestHandler):
             self.send_error_json(400, str(e))
         except Exception as e:
             self.send_error_json(500, str(e))
+
+
+    def handle_cookies(self, data):
+        if COOKIES_PASSWORD:
+            if (data.get("password") or "").strip() != COOKIES_PASSWORD:
+                self.send_error_json(403, "Invalid password")
+                return
+        content = (data.get("content") or "").strip()
+        if not content:
+            self.send_error_json(400, "No cookie content provided")
+            return
+        COOKIES_FILE.write_text(content)
+        self.send_json(200, {"ok": True})
 
 
 # ── Main ─────────────────────────────────────────────────────
