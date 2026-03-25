@@ -53,6 +53,7 @@ def get_extra_args():
     if COOKIES_FILE.exists():
         args += ["--cookies", str(COOKIES_FILE)]
         args += ["--extractor-args", "youtube:player_client=web"]
+        args += ["--remote-components", "ejs:github"]
     else:
         args += ["--extractor-args", "youtube:player_client=android,ios"]
     return args
