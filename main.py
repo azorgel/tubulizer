@@ -52,7 +52,9 @@ def get_extra_args():
     args = []
     if COOKIES_FILE.exists():
         args += ["--cookies", str(COOKIES_FILE)]
-    args += ["--extractor-args", "youtube:player_client=android,ios"]
+        args += ["--extractor-args", "youtube:player_client=web"]
+    else:
+        args += ["--extractor-args", "youtube:player_client=android,ios"]
     return args
 
 # Quality presets shown to the user.
