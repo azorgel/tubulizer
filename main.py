@@ -52,7 +52,11 @@ def get_extra_args():
     args = []
     if COOKIES_FILE.exists():
         args += ["--cookies", str(COOKIES_FILE)]
-    args += ["--extractor-args", "youtube:player_client=web", "--js-runtimes", "node"]
+    args += [
+        "--extractor-args", "youtube:player_client=web",
+        "--js-runtimes", "node",
+        "--remote-components", "ejs:github",
+    ]
     return args
 
 # Quality presets shown to the user.

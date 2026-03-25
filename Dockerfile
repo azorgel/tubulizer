@@ -4,7 +4,8 @@ FROM python:3.12-slim
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ffmpeg nodejs && \
     rm -rf /var/lib/apt/lists/* && \
-    pip install --no-cache-dir yt-dlp
+    pip install --no-cache-dir yt-dlp && \
+    yt-dlp --install-remote-components ejs:github || true
 
 WORKDIR /app
 COPY main.py .
